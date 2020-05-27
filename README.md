@@ -1,2 +1,41 @@
 # my_utils
-工具包
+- 工具包
+# 包含方法
+### 获取本地excel文件数据转成dict
+- local_data_2_list
+### 数据筛选方法
+- data_filter
+### 递归数据校验
+- data_verify
+### 获取路径下所有有效指定文件
+- get_all_appoint_file_path
+### 获取路径下所有有效指定文件 迭代器
+- get_all_appoint_file_path_yield
+### 清除空文件夹
+- remove_null_file
+### 清除指定文件名文件
+- remove_appoint_file
+### 特定字段初始化
+- appoint_data_initialize
+### 设置对象指定结构下的数据
+- set_obj_data
+### 获取对象指定结构下的数据
+- get_obj_data
+### 数据赋值
+- data_assignment
+### 获取对象中的所有列表集合
+- get_all_list
+### 拆分文件路径
+- get_path_file_info
+### 字典列表转列表字典 用于data frame类型数据文件导出
+- list_dict_2_dict_list
+### 获取数据的MD5值
+- get_md5
+### 返回数字插入的位置
+- insert_index
+### 括号字符串的下标
+- get_bracket_group_index
+### 计算两个列表的最小正数差值
+- min_difference
+### 文件打开校验
+- file_open_verify

@@ -301,24 +301,6 @@ def data_assignment(base_obj: typing.Union[typing.Dict, typing.List],
     return base_obj
 
 
-def call_back(file_path: str) -> bool:
-    """
-    地址判断规则
-    :param file_path: 文件路径
-    :return:
-    """
-    # 获取文件内容
-    with open(file=file_path, mode='r', encoding='utf-8') as f:
-        _data = json.load(fp=f)
-        _setting = _data.get('extract_module_url')  # 获取提取模块连接配置信息
-        # 判断是否存在配置信息
-        if not _setting:
-            ret = False
-        else:
-            ret = _setting['start'] and not _setting['complete']  # 配置启动 且 未完成
-    return ret
-
-
 def get_all_list(source_obj: typing.Any) -> typing.List:
     """
     获取对象中的所有列表集合

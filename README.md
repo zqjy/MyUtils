@@ -39,3 +39,7 @@
 - min_difference
 ### 文件打开校验
 - file_open_verify
+### 时间统计装饰器
+- time_statistics
+### 异常捕获装饰器
+- catch_exceptions

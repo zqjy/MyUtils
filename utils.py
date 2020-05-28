@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import collections
 import copy
+import datetime
+import functools
 import hashlib
 import json
 import os
@@ -9,6 +11,7 @@ import pandas as pd
 import re
 import pathlib
 import logging
+import traceback
 
 from typing import Dict, List
 
@@ -530,6 +533,44 @@ def file_open_verify(file_path: str) -> None:
             f.readline()
     except Exception as e:
         raise Exception(f"请关闭文件：{file_path} error：{e}")
+
+
+def time_statistics(func: typing.Callable) -> typing.Callable:
+    """
+    执行时间装饰器
+    :param func: 被装饰方法
+    :return:
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        _start_time = datetime.datetime.now()  # 开始时间
+        ret = func(*args, **kwargs)
+        _end_time = datetime.datetime.now()  # 结束时间
+        _diff_time = _end_time - _start_time  # 时间差
+        print(f"执行时间：{_diff_time.seconds} 秒")
+        return ret
+
+    return wrapper
+
+
+def catch_exceptions(func: typing.Callable) -> typing.Callable:
+    """
+    异常捕获装饰器
+    :param func:
+    :return:
+    """
+
+    @functools.wraps(func)
+    def decorator(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            message = f"程序发生异常, 错误信息：\n{traceback.format_exc()}"
+            # print(message)
+            return message
+
+    return decorator
 
 
 if __name__ == '__main__':

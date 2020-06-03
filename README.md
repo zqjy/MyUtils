@@ -43,3 +43,7 @@
 - time_statistics
 ### 异常捕获装饰器
 - catch_exceptions
+### 格式化字符串列表打印
+- format_print
+### 格式化字符串打印
+- format_print_one

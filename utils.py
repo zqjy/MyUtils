@@ -572,6 +572,38 @@ def catch_exceptions(func: typing.Callable) -> typing.Callable:
 
     return decorator
 
+def format_print(data_list: typing.List, size: int = 5, key: str = '') -> None:
+    """
+    格式化字符串列表打印
+    :return:
+    """
+    _size = size
+    for _index, d in enumerate(data_list):
+        if key:
+            _message = f"\t{d[key]}"  # 调试语句内容
+        else:
+            _message = f"\t{d}"  # 调试语句内容
+        # 设置输出结尾
+        format_print_one(index=_index, size=_size, message=_message)
+
+
+def format_print_one(index: int, size: int = 5, message: str = "") -> None:
+    """
+    格式化字符串打印
+    :return:
+    """
+    _size = size
+    if not message:
+        _message = f"\t{index}"
+    else:
+        _message = message
+    # 设置输出结尾
+    if index % _size == _size - 1:
+        _end = '\n'
+    else:
+        _end = ''
+    print(_message, end=_end)  # 调试语句
+
 
 if __name__ == '__main__':
     pass

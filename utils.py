@@ -19,7 +19,7 @@ from typing import Dict, List
 _LOG_FORMAT_1 = '%(asctime)s  %(levelname)s--> %(message)s <--%(filename)s - %(funcName)s - %(lineno)d'
 _LOG_FORMAT_2 = '%(asctime)s [%(filename)s -> %(funcName)s -> %(lineno)d] %(levelname)s: %(message)s'
 # 初始化日志配置
-logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT_2)
+# logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT_2)
 my_logger = logging.getLogger(__name__)
 
 
@@ -413,7 +413,7 @@ def get_bracket_group_index(data: str, index_type: str = '') -> typing.List:
     """
     获取括号组 括号字符串的下标
     :param data:
-    :param index_type: 下标类型 '' outer
+    :param index_type: 下标类型 '' outer invalid
     :return:
     """
     # 括号字典
@@ -452,23 +452,37 @@ def get_bracket_group_index(data: str, index_type: str = '') -> typing.List:
     _right_length = len(_right_bracket_list)  # 右括号数量
     # 获取所有括号分组下标列表  以按左括号下标排序
     ret_list = min_difference(a_list=_left_bracket_list, b_list=_right_bracket_list)
-    # 仅返回最外层括号
-    if index_type == 'outer':
-        # 判断下标列表是否有效
-        if ret_list:
+    # 判断下标列表是否有效
+    if ret_list:
+        # 仅返回最外层括号
+        if index_type == 'outer':
             _start_list = [ret_list[0][0]]  # 获取第一组左括号
             _end_list = [ret_list[0][1]]  # 获取第一组右括号
             # 遍历剩余括号组
-            for _group in ret_list[1:]:
+            for _start, _end in ret_list[1:]:
                 # 判断 当前括号组左括号 是否 不被 前面括号包含
-                if _group[0] > _end_list[-1]:
-                    _start_list.append(_group[0])  # 添加左括号下标
-                    _end_list.append(_group[1])  # 添加右括号下标
+                if _start > _end_list[-1]:
+                    _start_list.append(_start)  # 添加左括号下标
+                    _end_list.append(_end)  # 添加右括号下标
             return list(zip(_start_list, _end_list))  # 打包转成列表
-        else:
-            return ret_list
-    else:
-        return ret_list
+        # 返回无效括号下标
+        elif index_type == 'invalid':
+            invalid_list = []  # 无效列表
+            valid_list = [_j for _i in ret_list for _j in _i]  # 有效列表
+            for _start, _end in ret_list:
+                # 连续括号组
+                _start_next = _start+1
+                _end_next = _end-1
+                if _start_next in valid_list and _end_next in valid_list:
+                    invalid_list += [_start_next, _end_next]
+                # 无内容括号
+                elif _start + 1 == _end:
+                    invalid_list += [_start, _end]
+            # 不匹配单括号
+            if _right_length != _left_length:
+                invalid_list += list(set(_left_bracket_list + _right_bracket_list) - set(valid_list))
+            return invalid_list
+    return ret_list
 
 
 def min_difference(a_list: typing.List, b_list: typing.List) -> typing.List:

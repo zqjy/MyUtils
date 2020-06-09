@@ -7,7 +7,7 @@ import hashlib
 import json
 import os
 import typing
-import pandas as pd
+# import pandas as pd
 import re
 import pathlib
 import logging
@@ -409,10 +409,11 @@ def insert_index(num_list: typing.List[int], data: int) -> int:
     return _right
 
 
-def get_bracket_group_index(data: str) -> typing.List:
+def get_bracket_group_index(data: str, index_type: str = '') -> typing.List:
     """
     获取括号组 括号字符串的下标
     :param data:
+    :param index_type: 下标类型 '' outer
     :return:
     """
     # 括号字典
@@ -449,36 +450,25 @@ def get_bracket_group_index(data: str) -> typing.List:
     _right_bracket_iter = re.finditer(_right_re, data)  # 迭代器
     _right_bracket_list = [_i.start() for _i in _right_bracket_iter]  # 下标
     _right_length = len(_right_bracket_list)  # 右括号数量
-    # 判断括号数量是否一致
-    # if _left_length != _right_length:
-    #     raise Exception(f"括号数量不一致，左：{len(_left_bracket_list)} 右：{len(_right_bracket_list)}")
-
-    # print(_left_bracket_list)
-    # print(_right_bracket_list)
-
-    # _insert_index_old = None  # 上一个插入位置
-    # _start_index = 0
-    # _start_index_list = []  # 左括号开始位置
-    # # 遍历右括号的下标列表
-    # for _right in _right_bracket_list:
-    #     # 获取插入下标
-    #     _insert_index = insert_index(num_list=_left_bracket_list, data=_right)
-    #     # 判断是否新插入下标
-    #     if len(ret_dict) > 0 and _insert_index not in ret_dict:
-    #         _start_index = _insert_index_old  # 重置左括号位置
-    #         # _start_index_list += _left_bracket_list[:_insert_index_old]
-    #
-    #     # 左括号位置
-    #     _left = _left_bracket_list[_start_index]
-    #     # _left = _left_bracket_list[_start_index_list[-1]]
-    #     # 判断右括号位置是否合理
-    #     if _right > _left:
-    #         ret_dict[_insert_index] = (_left, _right)  # 更新括号下标组
-    #         # del _start_index_list[-1]
-    #
-    #     _insert_index_old = _insert_index  # 记录插入下标位置
-    # return list(ret_dict.values())
-    return min_difference(a_list=_left_bracket_list, b_list=_right_bracket_list)
+    # 获取所有括号分组下标列表  以按左括号下标排序
+    ret_list = min_difference(a_list=_left_bracket_list, b_list=_right_bracket_list)
+    # 仅返回最外层括号
+    if index_type == 'outer':
+        # 判断下标列表是否有效
+        if ret_list:
+            _start_list = [ret_list[0][0]]  # 获取第一组左括号
+            _end_list = [ret_list[0][1]]  # 获取第一组右括号
+            # 遍历剩余括号组
+            for _group in ret_list[1:]:
+                # 判断 当前括号组左括号 是否 不被 前面括号包含
+                if _group[0] > _end_list[-1]:
+                    _start_list.append(_group[0])  # 添加左括号下标
+                    _end_list.append(_group[1])  # 添加右括号下标
+            return list(zip(_start_list, _end_list))  # 打包转成列表
+        else:
+            return ret_list
+    else:
+        return ret_list
 
 
 def min_difference(a_list: typing.List, b_list: typing.List) -> typing.List:
@@ -571,6 +561,7 @@ def catch_exceptions(func: typing.Callable) -> typing.Callable:
             return message
 
     return decorator
+
 
 def format_print(data_list: typing.List, size: int = 5, key: str = '') -> None:
     """

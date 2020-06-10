@@ -409,11 +409,11 @@ def insert_index(num_list: typing.List[int], data: int) -> int:
     return _right
 
 
-def get_bracket_group_index(data: str, index_type: str = '') -> typing.List:
+def get_bracket_group_index(data: str = '', index_type: str = 're') -> typing.List:
     """
     获取括号组 括号字符串的下标
     :param data:
-    :param index_type: 下标类型 '' outer invalid
+    :param index_type: 下标类型 '' outer invalid re
     :return:
     """
     # 括号字典
@@ -443,6 +443,9 @@ def get_bracket_group_index(data: str, index_type: str = '') -> typing.List:
     # 左括号正则
     _left_re = r'[{}]'.format(''.join(list(_bracket_dict.keys())))
     _right_re = r'[{}]'.format(''.join(list(_bracket_dict.values())))
+    # 返回括号正则
+    if index_type == 're':
+        return [_left_re, _right_re]
     # 获取所有括号下标
     _left_bracket_iter = re.finditer(_left_re, data)  # 迭代器
     _left_bracket_list = [_i.start() for _i in _left_bracket_iter]  # 下标
@@ -482,6 +485,10 @@ def get_bracket_group_index(data: str, index_type: str = '') -> typing.List:
             if _right_length != _left_length:
                 invalid_list += list(set(_left_bracket_list + _right_bracket_list) - set(valid_list))
             return invalid_list
+    else:
+        # 返回无效括号下标
+        if index_type == 'invalid':
+            return _left_bracket_list + _right_bracket_list
     return ret_list
 
 

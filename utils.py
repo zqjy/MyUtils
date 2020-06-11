@@ -474,17 +474,20 @@ def get_bracket_group_index(data: str = '', index_type: str = 're') -> typing.Li
             valid_list = [_j for _i in ret_list for _j in _i]  # 有效列表
             for _start, _end in ret_list:
                 # 连续括号组
-                _start_next = _start+1
-                _end_next = _end-1
+                _start_next = _start + 1
+                _end_next = _end - 1
                 if _start_next in valid_list and _end_next in valid_list:
                     invalid_list += [_start_next, _end_next]
                 # 无内容括号
                 elif _start + 1 == _end:
                     invalid_list += [_start, _end]
+                # 头尾括号
+                if _start == 0 and _end == len(data) - 1:
+                    invalid_list += [_start, _end]
             # 不匹配单括号
             if _right_length != _left_length:
                 invalid_list += list(set(_left_bracket_list + _right_bracket_list) - set(valid_list))
-            return invalid_list
+            return list(set(invalid_list))
     else:
         # 返回无效括号下标
         if index_type == 'invalid':
@@ -494,13 +497,20 @@ def get_bracket_group_index(data: str = '', index_type: str = 're') -> typing.Li
 
 def min_difference(a_list: typing.List, b_list: typing.List) -> typing.List:
     """
-    计算两个列表的最小正数差值
+    计算两个列表的最小正数差值 b-a
     :param a_list: 数值列表1
     :param b_list: 数值列表2
     :return:
     """
+    # 排序
+    a_list.sort()
+    b_list.sort()
     # 没有数据 终止
     if len(a_list) == 0 or len(b_list) == 0:
+        return []
+
+    # 没有一个a小于b
+    if a_list[0] > b_list[-1]:
         return []
 
     ret_dict = {}
@@ -615,6 +625,21 @@ def format_print_one(index: int, size: int = 5, message: str = "") -> None:
     else:
         _end = ''
     print(_message, end=_end)  # 调试语句
+
+
+def my_join(collection: typing.Collection, symbol: str = r'|', sub_symbol: str = r'§', is_split: bool = False) -> str:
+    """
+    集合拼接
+    :param collection: 数据源集合
+    :param symbol: 连接符
+    :param sub_symbol: 数据出现连接符相同字符替换
+    :param is_split: 拼接前是否拆分
+    :return:
+    """
+    if is_split:
+        return symbol.join([str(_i) for _j in collection if str(_j) for _i in re.split(f"[{symbol}]", str(_j))])
+    else:
+        return symbol.join([re.sub(f"[{symbol}]", sub_symbol, str(_i)) for _i in collection if str(_i)])
 
 
 if __name__ == '__main__':

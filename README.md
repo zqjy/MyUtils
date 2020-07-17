@@ -47,5 +47,7 @@
 - format_print
 ### 格式化字符串打印
 - format_print_one
+### 列表去重
+- list_unique
 ### 集合拼接功能
 - my_join

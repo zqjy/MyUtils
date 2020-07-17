@@ -413,7 +413,7 @@ def get_bracket_group_index(data: str = '', index_type: str = 're') -> typing.Li
     """
     获取括号组 括号字符串的下标
     :param data:
-    :param index_type: 下标类型 '' outer invalid re
+    :param index_type: 下标类型 '' outer invalid re all
     :return:
     """
     # 括号字典
@@ -453,7 +453,7 @@ def get_bracket_group_index(data: str = '', index_type: str = 're') -> typing.Li
     _right_bracket_iter = re.finditer(_right_re, data)  # 迭代器
     _right_bracket_list = [_i.start() for _i in _right_bracket_iter]  # 下标
     _right_length = len(_right_bracket_list)  # 右括号数量
-    # 获取所有括号分组下标列表  以按左括号下标排序
+    # 获取所有括号分组下标列表  已经按左括号下标排序
     ret_list = min_difference(a_list=_left_bracket_list, b_list=_right_bracket_list)
     # 判断下标列表是否有效
     if ret_list:
@@ -627,7 +627,22 @@ def format_print_one(index: int, size: int = 5, message: str = "") -> None:
     print(_message, end=_end)  # 调试语句
 
 
-def my_join(collection: typing.Collection, symbol: str = r'|', sub_symbol: str = r'§', is_split: bool = False) -> str:
+def list_unique(collection: typing.List, remove_invalid: bool = True) -> typing.List:
+    """
+    集合去重
+    :param collection: 数据源集合
+    :return:
+    """
+    _set = set(collection)
+    ret_list = list(_set)
+    ret_list.sort(key=collection.index)
+    if not remove_invalid:
+        return ret_list
+    else:
+        return [_i for _i in ret_list if str(_i).strip() != '' and _i is not None]
+
+
+def my_join(collection: typing.List, symbol: str = r'|', sub_symbol: str = r'§', is_split: bool = False) -> str:
     """
     集合拼接
     :param collection: 数据源集合
@@ -636,10 +651,11 @@ def my_join(collection: typing.Collection, symbol: str = r'|', sub_symbol: str =
     :param is_split: 拼接前是否拆分
     :return:
     """
+    _list = list_unique(collection)
     if is_split:
-        return symbol.join([str(_i) for _j in collection if str(_j) for _i in re.split(f"[{symbol}]", str(_j))])
+        return symbol.join([str(_i) for _j in _list if str(_j) for _i in re.split(f"[{symbol}]", str(_j))])
     else:
-        return symbol.join([re.sub(f"[{symbol}]", sub_symbol, str(_i)) for _i in collection if str(_i)])
+        return symbol.join([re.sub(f"[{symbol}]", sub_symbol, str(_i)) for _i in _list if str(_i)])
 
 
 if __name__ == '__main__':

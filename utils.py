@@ -409,6 +409,25 @@ def insert_index(num_list: typing.List[int], data: int) -> int:
     return _right
 
 
+def get_not_in_bracket_index(data: str, index_col: typing.Collection, index_type: str = 'outer') -> typing.Generator:
+    """
+    获取不在括号内的下标 生成器
+    :param data:
+    :param index_col: 下标集合
+    :param index_type: get_bracket_group_index 的 index_type 参数
+    :return:
+    """
+    # 获取括号下标列表
+    _bracket_list = get_bracket_group_index(data, index_type)
+    _index_list = []
+    for _s, _e in _bracket_list:
+        _index_list += list(range(_s, _e + 1))
+    # 判断下标是否在括号内
+    for _i in index_col:
+        if _i not in _index_list:
+            yield _i
+
+
 def get_bracket_group_index(data: str = '', index_type: str = 're') -> typing.List:
     """
     获取括号组 括号字符串的下标

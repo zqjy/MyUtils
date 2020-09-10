@@ -409,6 +409,25 @@ def insert_index(num_list: typing.List[int], data: int) -> int:
     return _right
 
 
+def get_not_in_bracket_index(data: str, index_col: typing.Collection, index_type: str = 'outer') -> typing.Generator:
+    """
+    获取不在括号内的下标 生成器
+    :param data:
+    :param index_col: 下标集合
+    :param index_type: get_bracket_group_index 的 index_type 参数
+    :return:
+    """
+    # 获取括号下标列表
+    _bracket_list = get_bracket_group_index(data, index_type)
+    _index_list = []
+    for _s, _e in _bracket_list:
+        _index_list += list(range(_s, _e + 1))
+    # 判断下标是否在括号内
+    for _i in index_col:
+        if _i not in _index_list:
+            yield _i
+
+
 def get_bracket_group_index(data: str = '', index_type: str = 're') -> typing.List:
     """
     获取括号组 括号字符串的下标
@@ -657,6 +676,154 @@ def my_join(collection: typing.List, symbol: str = r'|', sub_symbol: str = r'§'
     else:
         return symbol.join([re.sub(f"[{symbol}]", sub_symbol, str(_i)) for _i in _list if str(_i)])
 
+def get_separator_index_and_not_in_bracket(data: str, separator: re) -> typing.List:
+    """
+    获取不在括号内的分隔符的下标
+    :param data: 字符串
+    :param separator: 分隔符
+    :return:
+    """
+    _index_iter = re.finditer(separator, data)  # 获取所有分隔符下标
+    index_list = [_i.start() for _i in _index_iter]  # 获取所有分隔符下标
+    _skip_list = []  # 跳过的下标
+    # 获取括号组的下标
+    for _start, _end in get_bracket_group_index(data=data, index_type='all'):
+        _skip_list += list(range(_start, _end + 1))
+    # 去重
+    _skip_list = list(set(_skip_list))
+    # 遍历分隔符下标 剔除括号内下标
+    for _index in index_list[:]:
+        if _index in _skip_list:
+            index_list.remove(_index)
+    return index_list
+
+
+def list_unique(collection: typing.List, remove_invalid: bool = True) -> typing.List:
+    """
+    集合去重
+    :param remove_invalid: 是否删除不合法字符
+    :param collection: 数据源集合
+    :return:
+    """
+    _set = set(collection)
+    ret_list = list(_set)
+    ret_list.sort(key=collection.index)
+    if not remove_invalid:
+        return ret_list
+    else:
+        return [_i for _i in ret_list if str(_i).strip() != '' and _i is not None]
+
+def spilt_str(data: str, separator: re) -> typing.List:
+    """
+    按分隔符字符串 跳过括号内分隔符
+    :param data:
+    :param separator:
+    :return:
+    """
+    data = str(data)
+    _name_list = [
+        '政治学、经济学与哲学',  # 1
+        '土木、水利与海洋工程',  # 1
+        '人口、资源与环境经济学',  # 3,4
+        '矿物学、岩石学、矿床学',  # 3,4
+        '导航、制导与控制',  # 3,4
+        '供热、供燃气、通风及空调工程',  # 3,4
+        '港口、海岸及近海工程',  # 3,4
+        '火炮、自动武器与弹药工程',  # 3,4
+        '粮食、油脂及植物蛋白工程',  # 3,4
+    ]  # 替换结果一定要有括号 表示名称是一个整体
+    _name_reg = r'({})'.format(r'|'.join(_name_list))
+    data = re.sub(_name_reg, r'（\g<1>）', data)  # 处理特殊名称
+
+    _index_list = get_separator_index_and_not_in_bracket(data, separator)
+    # 获取字符串范围
+    _range_zip = zip([0, *_index_list], [*_index_list, None])
+    # 截取字符串
+    for _index, (_start, _end) in enumerate(_range_zip):
+        ret_data = data[_start + 1 if _index > 0 else _start: _end]
+        yield ret_data
+
+
+def my_join_2(data_list: typing.List, separator: str) -> str:
+    """
+    以分隔符拼接数据
+    :param data_list: 数据集合
+    :param separator: 分隔符
+    :return:
+    """
+    data_list = list_unique(data_list)
+    # 遍历数据 替换存在分隔符的数据
+    for _index, _data in enumerate(data_list[:]):
+        _index_list = get_separator_index_and_not_in_bracket(_data, separator)
+        # 判断分隔符是否存在在字符串中
+        if _index_list:
+            data_list[_index] = f"（{_data}）"
+    return separator.join(data_list)
+
+
+def invalid_bracket_clear(data_str: str) -> str:
+    """
+    无效括号清理
+    :param data_str: 数据源
+    :return:
+    """
+    # 获取无效括号下标
+    _invalid_index_list = get_bracket_group_index(data_str, 'invalid')
+    # 剔除无效括号
+    if _invalid_index_list:
+        return ''.join([_v for _i, _v in enumerate(data_str) if _i not in _invalid_index_list])  # 字符串转列表
+    else:
+        return data_str
+
+
+def spilt_str_by_bracket(data_str: str, is_extract_head: bool = True) -> typing.List:
+    """
+    根据括号分割数据
+    :param data_str: 数据源
+    :param is_extract_head: 是否提取第一个有效括号前的数据
+    :return:
+    """
+    ret_list = []  # 子专业方向
+    _name = ''  # 子专业名称
+    # 获取括号正则
+    _left_re, _right_re = get_bracket_group_index()
+    # 剔除无效括号
+    data_str = invalid_bracket_clear(data_str)
+    # 获取所有括号
+    _all_bracket = re.findall(_left_re + r'|' + _right_re, data_str)
+    # 可分割字符串规则
+    _structure_re = r'.*?(?:' + _left_re + r'(.*?)' + _right_re + r'){1,}.*?$'
+    if len(_all_bracket) > 2 and not re.match(_structure_re, data_str):
+        return [data_str]
+    # 遍历括号下标列表
+    _range_list = get_bracket_group_index(data_str, 'outer')
+    if _range_list:
+        _min_index = _range_list[0][0]  # 第一个括号的下标
+        _max_index = _range_list[-1][-1]  # 最后一个括号的下标
+        # 初始化专业名称
+        if _min_index != 0 and not _name:
+            if is_extract_head:
+                _name = data_str[:_min_index]
+        for _index, (_start, _end) in enumerate(_range_list):
+            # 获取上一个括号的结尾
+            if is_extract_head:
+                _end_prev = _range_list[_index - 1][1] if _index > 0 else _start - 1
+            else:
+                _end_prev = _range_list[_index - 1][1] if _index > 0 else -1
+            # 截取专业扩展
+            if _start == _end_prev + 1:
+                _info = data_str[_start + 1: _end]
+            else:
+                _info = data_str[_end_prev + 1: _end + 1]
+            if _info and _info not in ret_list:
+                ret_list.append(_info)
+        # 截取专业扩展
+        _info = data_str[_max_index + 1:]
+        if _info and _info not in ret_list:
+            ret_list.append(_info)
+    else:
+        _name = data_str  # 保留原值
+    return [_name] + ret_list
 
 if __name__ == '__main__':
     pass

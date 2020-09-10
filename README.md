@@ -51,3 +51,17 @@
 - list_unique
 ### 集合拼接功能
 - my_join
+### 获取不在括号内的下标 生成器
+- get_not_in_bracket_index
+### 获取不在括号内的分隔符的下标
+- get_separator_index_and_not_in_bracket
+### 按分隔符字符串 跳过括号内分隔符
+- spilt_str
+### 以分隔符拼接数据
+- my_join_2
+### 无效括号清理
+- invalid_bracket_clear
+### 根据括号分割数据
+- spilt_str_by_bracket
+### 集合去重
+- list_unique

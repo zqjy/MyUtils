@@ -7,7 +7,7 @@ import hashlib
 import json
 import os
 import typing
-# import pandas as pd
+import pandas as pd
 import re
 import pathlib
 import logging
@@ -495,7 +495,7 @@ def get_bracket_group_index(data: str = '', index_type: str = 're') -> typing.Li
                 # 连续括号组
                 _start_next = _start + 1
                 _end_next = _end - 1
-                if _start_next in valid_list and _end_next in valid_list:
+                if (_start_next, _end_next) in ret_list:
                     invalid_list += [_start_next, _end_next]
                 # 无内容括号
                 elif _start + 1 == _end:
@@ -697,21 +697,6 @@ def get_separator_index_and_not_in_bracket(data: str, separator: re) -> typing.L
             index_list.remove(_index)
     return index_list
 
-
-def list_unique(collection: typing.List, remove_invalid: bool = True) -> typing.List:
-    """
-    集合去重
-    :param remove_invalid: 是否删除不合法字符
-    :param collection: 数据源集合
-    :return:
-    """
-    _set = set(collection)
-    ret_list = list(_set)
-    ret_list.sort(key=collection.index)
-    if not remove_invalid:
-        return ret_list
-    else:
-        return [_i for _i in ret_list if str(_i).strip() != '' and _i is not None]
 
 def spilt_str(data: str, separator: re) -> typing.List:
     """

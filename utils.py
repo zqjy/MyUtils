@@ -747,6 +747,16 @@ def my_join_2(data_list: typing.List, separator: str) -> str:
     return separator.join(data_list)
 
 
+def clear_invalid_bracket(*args, **kwargs) -> str:
+    """
+    无效括号清理
+    :param args:
+    :param kwargs:
+    :return:
+    """
+    return invalid_bracket_clear(*args, **kwargs)
+
+
 def invalid_bracket_clear(data_str: str) -> str:
     """
     无效括号清理

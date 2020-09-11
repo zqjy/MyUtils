@@ -61,6 +61,7 @@
 - my_join_2
 ### 无效括号清理
 - invalid_bracket_clear
+- clear_invalid_bracket
 ### 根据括号分割数据
 - spilt_str_by_bracket
 ### 集合去重

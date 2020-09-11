@@ -676,6 +676,7 @@ def my_join(collection: typing.List, symbol: str = r'|', sub_symbol: str = r'§'
     else:
         return symbol.join([re.sub(f"[{symbol}]", sub_symbol, str(_i)) for _i in _list if str(_i)])
 
+
 def get_separator_index_and_not_in_bracket(data: str, separator: re) -> typing.List:
     """
     获取不在括号内的分隔符的下标
@@ -809,6 +810,17 @@ def spilt_str_by_bracket(data_str: str, is_extract_head: bool = True) -> typing.
     else:
         _name = data_str  # 保留原值
     return [_name] + ret_list
+
+
+def clear_both_side_symbol(data_str: str, rule: re = r'[^\dA-Za-z\u4e00-\u9fa5]') -> str:
+    """
+    清理字符串两边的符号
+    :param data_str: 清洗字符
+    :param rule: 规则
+    :return:
+    """
+    return re.sub(r'^{reg}+|{reg}+$'.format(**{'reg': rule}), r'', data_str)
+
 
 if __name__ == '__main__':
     pass

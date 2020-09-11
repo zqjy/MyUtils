@@ -65,3 +65,5 @@
 - spilt_str_by_bracket
 ### 集合去重
 - list_unique
+### 清理字符串两边的符号
+- clear_both_side_symbol
